@@ -1,0 +1,438 @@
+/* ─── IMPORTS ─────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@200;300;400;600&display=swap');
+
+/* ─── CSS VARIABLES ───────────────────────────────────── */
+:root {
+  --bg-deep:       #040b14;
+  --bg-mid:        #071224;
+  --bg-panel:      #0a1a2e;
+  --grid-line:     rgba(0, 200, 255, 0.06);
+  --glow-cyan:     #00c8ff;
+  --glow-teal:     #00ffd0;
+  --glow-violet:   #7c3aed;
+  --text-primary:  #e0f4ff;
+  --text-dim:      #4a7fa0;
+  --text-mono:     #00ffd0;
+
+  /* Category palette */
+  --c-alkali:        #ff4d6d;
+  --c-alkaline:      #ff8c42;
+  --c-transition:    #00b4d8;
+  --c-post:         #a8dadc;
+  --c-metalloid:     #52b788;
+  --c-nonmetal:      #74c69d;
+  --c-halogen:       #b7e4c7;
+  --c-noble:         #9d4edd;
+  --c-lanthanide:    #f4a261;
+  --c-actinide:      #e76f51;
+  --c-unknown:       #415a77;
+
+  --cell-size: 68px;
+  --cell-gap:  4px;
+}
+
+/* ─── RESET & BASE ────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; min-height: 100vh;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: 'Exo 2', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ─── ANIMATED GRID BACKGROUND ───────────────────────── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 48px 48px;
+  animation: gridDrift 60s linear infinite;
+  pointer-events: none; z-index: 0;
+}
+@keyframes gridDrift {
+  0%   { background-position: 0 0; }
+  100% { background-position: 48px 48px; }
+}
+
+/* ─── SCANLINE OVERLAY ────────────────────────────────── */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0,0,0,0.08) 3px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none; z-index: 1;
+}
+
+/* ─── WRAPPER ─────────────────────────────────────────── */
+#app {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 48px;
+  min-height: 100vh;
+}
+
+/* ─── HEADER ──────────────────────────────────────────── */
+header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.site-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, var(--glow-cyan), var(--glow-teal));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 18px rgba(0,200,255,0.4));
+}
+
+.site-sub {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+
+
+/* ─── LEGEND ──────────────────────────────────────────── */
+.legend {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 8px 16px;
+  margin-bottom: 22px;
+  max-width: 900px;
+}
+
+.legend-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 0.65rem;
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.legend-item:hover { color: var(--text-primary); }
+
+.legend-dot {
+  width: 10px; height: 10px; border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ─── PERIODIC TABLE GRID ─────────────────────────────── */
+#periodic-table {
+  display: grid;
+  grid-template-columns: repeat(18, var(--cell-size));
+  gap: var(--cell-gap);
+  margin-bottom: 16px;
+}
+
+/* ─── ELEMENT CELLS ───────────────────────────────────── */
+.element {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.07);
+  background: var(--bg-panel);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  overflow: hidden;
+}
+
+/* Category color strips (left border glow) */
+.element::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--cat-color);
+  opacity: 0.9;
+}
+
+/* Hover state */
+.element:hover {
+  transform: translateY(-3px) scale(1.06);
+  border-color: var(--cat-color);
+  box-shadow:
+    0 0 16px color-mix(in srgb, var(--cat-color) 50%, transparent),
+    0 8px 24px rgba(0,0,0,0.5);
+  z-index: 10;
+}
+
+/* Active/selected */
+.element.selected {
+  border-color: var(--glow-teal);
+  box-shadow: 0 0 20px rgba(0,255,208,0.35);
+}
+
+/* Dimmed when searching */
+.element.dimmed {
+  opacity: 0.15;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Atomic number */
+.el-number {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.52rem;
+  color: var(--text-dim);
+  line-height: 1;
+  align-self: flex-start;
+  padding: 4px 5px 0;
+  width: 100%;
+}
+
+/* Symbol */
+.el-symbol {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+}
+
+/* Name */
+.el-name {
+  font-size: 0.44rem;
+  font-family: 'Exo 2', sans-serif;
+  font-weight: 300;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+  text-align: center;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 3px;
+}
+
+/* Atomic mass */
+.el-mass {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.44rem;
+  color: var(--text-dim);
+  margin-top: 1px;
+}
+
+/* ─── SPACER / LABEL CELLS ────────────────────────────── */
+.spacer { background: transparent; border: none; cursor: default; }
+.spacer:hover { transform: none; box-shadow: none; }
+
+.period-label, .group-label {
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  background: transparent;
+  border: none;
+  cursor: default;
+}
+.period-label:hover, .group-label:hover { transform: none; box-shadow: none; }
+
+/* ─── LANTHANIDE / ACTINIDE SEPARATOR ────────────────── */
+.la-ac-gap {
+  grid-column: 1 / -1;
+  height: 12px;
+}
+.la-ac-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  color: var(--text-dim);
+  background: transparent;
+  border: none;
+  cursor: default;
+  display: flex; align-items: center; justify-content: flex-end;
+  padding-right: 6px;
+  letter-spacing: 0.08em;
+}
+.la-ac-label:hover { transform: none; box-shadow: none; }
+
+/* ─── DETAIL PANEL ────────────────────────────────────── */
+#detail-panel {
+  position: fixed;
+  top: 50%; right: -420px;
+  transform: translateY(-50%);
+  width: 360px;
+  background: var(--bg-panel);
+  border: 1px solid rgba(0,200,255,0.2);
+  border-right: none;
+  border-radius: 12px 0 0 12px;
+  padding: 28px 24px;
+  z-index: 100;
+  transition: right 0.38s cubic-bezier(0.22,1,0.36,1);
+  backdrop-filter: blur(12px);
+  box-shadow: -8px 0 40px rgba(0,0,0,0.6);
+}
+
+#detail-panel.open { right: 0; }
+
+.panel-close {
+  position: absolute; top: 14px; right: 16px;
+  background: none; border: none;
+  color: var(--text-dim); font-size: 1.2rem;
+  cursor: pointer; transition: color 0.2s;
+  font-family: 'Rajdhani', sans-serif;
+}
+.panel-close:hover { color: var(--glow-cyan); }
+
+.panel-symbol {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 5rem; font-weight: 700;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--glow-cyan), var(--glow-teal));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 20px rgba(0,200,255,0.4));
+}
+
+.panel-name {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.4rem; font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+.panel-number {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+}
+
+.panel-divider {
+  border: none;
+  border-top: 1px solid rgba(0,200,255,0.1);
+  margin: 14px 0;
+}
+
+.panel-props {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.prop-item label {
+  display: block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.prop-item span {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--text-primary);
+}
+
+.prop-category span {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-family: 'Share Tech Mono', monospace;
+  background: color-mix(in srgb, var(--cat-color-panel, #00c8ff) 15%, transparent);
+  color: var(--cat-color-panel, #00c8ff);
+  border: 1px solid color-mix(in srgb, var(--cat-color-panel, #00c8ff) 40%, transparent);
+}
+
+.panel-description {
+  font-size: 0.78rem;
+  line-height: 1.65;
+  color: #7ba8bf;
+  margin-top: 10px;
+}
+
+/* ─── ELECTRON CONFIG VISUAL ──────────────────────────── */
+.electron-config {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--glow-teal);
+  background: rgba(0,255,208,0.05);
+  border: 1px solid rgba(0,255,208,0.12);
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin-top: 10px;
+  letter-spacing: 0.06em;
+  word-break: break-word;
+}
+
+/* ─── TOOLTIP ─────────────────────────────────────────── */
+#tooltip {
+  position: fixed;
+  background: rgba(4,11,20,0.95);
+  border: 1px solid rgba(0,200,255,0.25);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-primary);
+  pointer-events: none;
+  z-index: 200;
+  white-space: nowrap;
+  display: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+/* ─── CATEGORY COLORS ─────────────────────────────────── */
+.cat-alkali-metal        { --cat-color: var(--c-alkali); }
+.cat-alkaline-earth      { --cat-color: var(--c-alkaline); }
+.cat-transition-metal    { --cat-color: var(--c-transition); }
+.cat-post-transition     { --cat-color: var(--c-post); }
+.cat-metalloid           { --cat-color: var(--c-metalloid); }
+.cat-reactive-nonmetal   { --cat-color: var(--c-nonmetal); }
+.cat-noble-gas           { --cat-color: var(--c-noble); }
+.cat-halogen             { --cat-color: var(--c-halogen); }
+.cat-lanthanide          { --cat-color: var(--c-lanthanide); }
+.cat-actinide            { --cat-color: var(--c-actinide); }
+.cat-unknown             { --cat-color: var(--c-unknown); }
+
+/* ─── PULSE ANIMATION FOR LANDING ────────────────────── */
+@keyframes cellFadeIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.element {
+  animation: cellFadeIn 0.35s ease both;
+}
+
+/* ─── RESPONSIVE ──────────────────────────────────────── */
+@media (max-width: 1350px) {
+  :root { --cell-size: 58px; --cell-gap: 3px; }
+  .el-symbol { font-size: 1.2rem; }
+}
+
+@media (max-width: 1120px) {
+  :root { --cell-size: 50px; --cell-gap: 3px; }
+  .el-symbol { font-size: 1rem; }
+  .el-name, .el-mass { display: none; }
+}
+
+@media (max-width: 960px) {
+  :root { --cell-size: 42px; --cell-gap: 2px; }
+  .el-symbol { font-size: 0.9rem; }
+}

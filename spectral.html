@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VIZLAB — Spectral Viewer</title>
+  <link rel="stylesheet" href="spectral.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ── HEADER ──────────────────────────────────────── -->
+  <header>
+    <div class="header-left">
+      <a href="index.html" class="back-btn">← PERIODIC TABLE</a>
+      <div class="page-title">Spectral Viewer</div>
+    </div>
+    <div class="header-meta">// VIZLAB · EMISSION SPECTRA MODULE · D3.js v7</div>
+  </header>
+
+  <!-- ── SEARCH BAR ──────────────────────────────────── -->
+  <div class="search-bar">
+    <input id="element-search" type="text" placeholder="Filter elements…" autocomplete="off" />
+    <span class="search-hint">Scroll sidebar · Click any element · Scroll to zoom · Drag to pan</span>
+  </div>
+
+  <!-- ── SIDEBAR ─────────────────────────────────────── -->
+  <div id="sidebar">
+    <!-- Populated by JS -->
+  </div>
+
+  <!-- ── MAIN CONTENT ────────────────────────────────── -->
+  <div id="main">
+    <div class="empty-state">
+      <div class="empty-icon">⚛</div>
+      <div>Loading…</div>
+    </div>
+  </div>
+
+  <!-- ── FOOTER ──────────────────────────────────────── -->
+  <footer>
+    <span>VIZLAB PLATFORM — SPECTRAL DATA BASED ON NIST ATOMIC SPECTRA DATABASE</span>
+    <span>118 ELEMENTS · UV / VISIBLE / IR · D3.js INTERACTIVE</span>
+  </footer>
+
+</div><!-- /#app -->
+
+
+<!-- ── TOOLTIP ──────────────────────────────────────── -->
+<div id="spec-tooltip"></div>
+
+
+<!-- ── SCRIPTS ──────────────────────────────────────── -->
+<!-- D3.js v7 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<!-- Shared element data (from periodic table) -->
+<script src="script.js"></script>
+<!-- Spectral data & utilities -->
+<script src="spectral-data.js"></script>
+<!-- Spectral viewer logic -->
+<script src="spectral.js"></script>
+<script src="edu-modules.js"></script>
+
+</body>
+</html>

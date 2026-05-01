@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VIZLAB — Purity Analyser</title>
+  <link rel="stylesheet" href="purity.css"/>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-left">
+      <a href="index.html" class="back-btn">← PERIODIC TABLE</a>
+      <div class="page-title">Purity Analyser</div>
+    </div>
+    <div class="header-meta">// VIZLAB · OES SIMULATION · D3 + THREE.js + PLOTLY</div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+
+    <!-- Base element -->
+    <div>
+      <div class="section-label">Base Element (Sample)</div>
+      <div class="base-display">
+        <div class="base-sym" id="base-sym">H</div>
+        <div class="base-info">
+          <div class="base-name" id="base-name">Hydrogen</div>
+          <div class="base-z"   id="base-z">Z = 1</div>
+        </div>
+      </div>
+      <select class="el-select" id="base-select" style="margin-top:8px"></select>
+    </div>
+
+    <!-- Impurity slots -->
+    <div>
+      <div class="section-label">Impurities</div>
+      <div id="impurity-slots" style="display:flex;flex-direction:column;gap:10px"></div>
+      <button class="add-imp-btn" id="add-imp-btn" style="margin-top:8px">+ ADD IMPURITY</button>
+    </div>
+
+    <!-- Detection threshold -->
+    <div>
+      <div class="section-label">Detection Threshold</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:8px;line-height:1.5">
+        Lines below this intensity are undetectable by the instrument
+      </div>
+      <div class="threshold-row">
+        <label>THRESHOLD</label>
+        <input type="range" class="thresh-range" id="thresh-range" min="1" max="40" value="10">
+        <span class="threshold-val" id="thresh-val">10%</span>
+      </div>
+    </div>
+
+    <!-- Analyse button -->
+    <button class="analyse-btn" id="analyse-btn"> ANALYSE SAMPLE</button>
+
+    <!-- Purity score -->
+    <div class="purity-score-card" id="purity-score-card">
+      <div class="section-label" style="margin-bottom:8px">Purity Report</div>
+      <div class="purity-number" id="purity-number">—</div>
+      <div class="purity-label">SAMPLE PURITY</div>
+      <div class="purity-meter"><div class="purity-fill" id="purity-fill" style="width:0%"></div></div>
+      <div class="purity-breakdown" id="purity-breakdown"></div>
+    </div>
+
+    <!-- Spectrometer report -->
+    <div class="report-card" id="report-card">
+      <div style="color:var(--glow-cyan);margin-bottom:6px;letter-spacing:0.1em">OES REPORT</div>
+      <div class="report-line"><span>METHOD</span><span>Optical Emission</span></div>
+      <div class="report-line"><span>RANGE</span><span>200–1000 nm</span></div>
+      <div class="report-line"><span>LINES DETECTED</span><span id="rep-lines">—</span></div>
+      <div class="report-line"><span>IMPURITIES</span><span id="rep-imps">—</span></div>
+      <div class="report-line"><span>STATUS</span><span id="rep-status" style="color:var(--glow-teal)">AWAITING SAMPLE</span></div>
+    </div>
+
+    <!-- Edu note -->
+    <div class="edu-note">
+      <strong>How OES works:</strong> The sample is excited by heat or electric arc. Each element emits light at unique wavelengths. A spectrometer separates these wavelengths and measures their intensities. Impurities appear as extra lines — their intensity reveals their concentration.
+    </div>
+
+  </div><!-- /sidebar -->
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- Tabs -->
+    <div class="viz-card">
+      <div class="viz-tabs">
+        <button class="viz-tab active" data-tab="d3">2D Spectrum Overlay</button>
+        <button class="viz-tab" data-tab="three">3D Waterfall</button>
+        <button class="viz-tab" data-tab="plotly">Composition Analysis</button>
+      </div>
+
+      <!-- TAB 1: D3 -->
+      <div class="viz-panel active" id="tab-d3">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Emission Spectrum — Purity Overlay</div>
+            <div class="card-sub">Hover any line for details · Scroll to zoom · Drag to pan</div>
+          </div>
+        </div>
+        <div id="d3-chart"></div>
+        <div class="det-legend" id="det-legend">
+          <span><span class="det-dot" style="background:var(--glow-cyan)"></span>Base element</span>
+          <span><span class="det-dot" style="background:#ffcc00;border-top:2px dashed #ffcc44"></span>Detection threshold</span>
+          <span style="margin-left:auto;font-size:0.55rem">Lines below threshold = undetectable</span>
+        </div>
+      </div>
+
+      <!-- TAB 2: Three.js -->
+      <div class="viz-panel" id="tab-three">
+        <div class="card-header">
+          <div>
+            <div class="card-title">3D Concentration Waterfall</div>
+            <div class="card-sub">X = wavelength · Y = intensity · Z = impurity concentration — drag to rotate</div>
+          </div>
+        </div>
+        <canvas id="three-mount"></canvas>
+        <div class="three-controls">
+          <span>ROTATE: drag · ZOOM: scroll</span>
+          <button class="three-btn" id="three-reset">RESET VIEW</button>
+          <button class="three-btn" id="three-top">TOP VIEW</button>
+        </div>
+      </div>
+
+      <!-- TAB 3: Plotly -->
+      <div class="viz-panel" id="tab-plotly">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Composition Analysis</div>
+            <div class="card-sub">Spectral heatmap + element breakdown</div>
+          </div>
+        </div>
+        <div id="plotly-heatmap"></div>
+        <div style="border-top:1px solid var(--border)"></div>
+        <div id="plotly-bar"></div>
+      </div>
+
+    </div><!-- /viz-card -->
+
+    <!-- Line identification table -->
+    <div class="viz-card">
+      <div class="card-header">
+        <div class="card-title">Line Identification Table</div>
+        <div class="card-sub" id="line-table-sub">Select elements and analyse to populate</div>
+      </div>
+      <div style="overflow-x:auto;padding:0 16px 16px">
+        <table id="line-id-table" style="width:100%;border-collapse:collapse;font-family:'Share Tech Mono',monospace;font-size:0.68rem">
+          <thead>
+            <tr id="line-table-head" style="color:var(--text-dim);font-size:0.58rem;letter-spacing:0.1em">
+              <th style="text-align:left;padding:6px 12px 8px 0;border-bottom:1px solid var(--border)">λ (nm)</th>
+              <th style="text-align:left;padding:6px 12px 8px 0;border-bottom:1px solid var(--border)">Color</th>
+              <th style="text-align:left;padding:6px 12px 8px 0;border-bottom:1px solid var(--border)">Element</th>
+              <th style="text-align:left;padding:6px 12px 8px 0;border-bottom:1px solid var(--border)">Intensity</th>
+              <th style="text-align:left;padding:6px 12px 8px 0;border-bottom:1px solid var(--border)">Detected</th>
+              <th style="text-align:left;padding:6px 12px 8px 0;border-bottom:1px solid var(--border)">Region</th>
+              <th style="text-align:left;padding:6px 0 8px 0;border-bottom:1px solid var(--border)">Note</th>
+            </tr>
+          </thead>
+          <tbody id="line-table-body">
+            <tr><td colspan="7" style="padding:16px 0;color:var(--text-dim);text-align:center">Run analysis to see line identification</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<div id="pur-tooltip"></div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<script src="spectral-data.js"></script>
+<script src="purity.js"></script>
+</body>
+</html>

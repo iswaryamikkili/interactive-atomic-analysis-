@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VIZLAB — Periodic Table</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ── HEADER ──────────────────────────────────────── -->
+  <header>
+    <div class="site-title">VIZLAB</div>
+    <div class="site-sub">// VISUALIZATION PLATFORM &nbsp;·&nbsp; PERIODIC TABLE MODULE v1.0</div>
+    <a href="purity.html" style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;
+      letter-spacing:0.1em;color:#00c8ff;text-decoration:none;border:1px solid rgba(0,200,255,0.25);
+      padding:6px 14px;border-radius:3px;transition:all 0.2s;margin-top:6px;display:inline-block">
+      ⚗ PURITY ANALYSER →
+    </a>
+  </header>
+
+  <!-- ── SEARCH ──────────────────────────────────────── -->
+  <div class="search-wrap">
+    <input id="search" type="text" placeholder="Search element, symbol, category…" autocomplete="off" spellcheck="false" />
+  </div>
+
+  <!-- ── LEGEND ──────────────────────────────────────── -->
+  <div class="legend" id="legend">
+    <!-- populated by JS -->
+  </div>
+
+  <!-- ── TABLE ───────────────────────────────────────── -->
+  <div id="periodic-table">
+    <!-- populated by JS -->
+  </div>
+
+</div><!-- /#app -->
+
+
+<!-- ── DETAIL PANEL ─────────────────────────────────── -->
+<aside id="detail-panel">
+  <button class="panel-close" title="Close">✕</button>
+
+  <div class="panel-symbol">H</div>
+  <div class="panel-name">Hydrogen</div>
+  <div class="panel-number">Atomic Number: 1</div>
+
+  <hr class="panel-divider" />
+
+  <div class="panel-props">
+    <div class="prop-item">
+      <label>Atomic Mass</label>
+      <span id="prop-mass">—</span>
+    </div>
+    <div class="prop-item">
+      <label>Phase</label>
+      <span id="prop-phase">—</span>
+    </div>
+    <div class="prop-item">
+      <label>Melting Point</label>
+      <span id="prop-melt">—</span>
+    </div>
+    <div class="prop-item">
+      <label>Boiling Point</label>
+      <span id="prop-boil">—</span>
+    </div>
+    <div class="prop-item">
+      <label>Density</label>
+      <span id="prop-density">—</span>
+    </div>
+    <div class="prop-item">
+      <label>Discovered</label>
+      <span id="prop-discovery">—</span>
+    </div>
+    <div class="prop-item prop-category" style="grid-column: 1 / -1;">
+      <label>Category</label>
+      <span id="prop-category">—</span>
+    </div>
+  </div>
+
+  <hr class="panel-divider" />
+
+  <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;letter-spacing:.1em;color:var(--text-dim);margin-bottom:4px;">ELECTRON CONFIGURATION</div>
+  <div class="electron-config">—</div>
+
+  <p class="panel-description">—</p>
+
+  <hr class="panel-divider" />
+
+  <!-- Mini spectrum preview -->
+  <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;letter-spacing:.1em;color:var(--text-dim);margin-bottom:6px;">EMISSION SPECTRUM PREVIEW</div>
+  <canvas id="panel-spectrum-canvas" width="312" height="40"
+    style="width:100%;height:40px;border-radius:4px;background:#000;border:1px solid rgba(0,200,255,0.12);display:block;margin-bottom:10px;"></canvas>
+  <a id="panel-spectrum-link" href="spectral.html?z=1" target="_blank"
+    style="display:block;text-align:center;font-family:'Share Tech Mono',monospace;font-size:0.65rem;
+           letter-spacing:0.12em;color:var(--glow-cyan);border:1px solid rgba(0,200,255,0.25);
+           border-radius:3px;padding:7px;text-decoration:none;transition:all 0.2s;
+           background:rgba(0,200,255,0.04);">
+     OPEN FULL SPECTRAL VIEWER →
+  </a>
+</aside>
+
+
+<!-- ── TOOLTIP ──────────────────────────────────────── -->
+<div id="tooltip"></div>
+
+
+<script src="spectral-data.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
